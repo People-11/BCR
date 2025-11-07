@@ -176,7 +176,8 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
-            signingConfig = signingConfigs.getByName("release")
+            // Use debug signing for release builds (no keystore needed)
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
