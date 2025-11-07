@@ -24,7 +24,7 @@ jobs:
           cache: gradle
 
       - name: Build and test
-        run: ./gradlew --no-daemon --debug build zipRelease
+        run: ./gradlew --no-daemon build zipRelease
 
       - name: Upload release artifacts
         uses: actions/upload-artifact@v4

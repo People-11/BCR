@@ -111,7 +111,6 @@ val projectUrl = "https://github.com/chenxiaolong/BCR"
 val releaseMetadataBranch = "master"
 
 val extraDir = layout.buildDirectory.map { it.dir("extra") }
-val archiveDir = extraDir.map { it.dir("archive") }
 
 android {
     namespace = "com.chiller3.bcr"
@@ -137,13 +136,6 @@ android {
     }
     androidResources {
         generateLocaleConfig = true
-    }
-    sourceSets {
-        getByName("main") {
-            assets {
-                srcDir(archiveDir)
-            }
-        }
     }
     signingConfigs {
         create("release") {
@@ -220,38 +212,10 @@ dependencies {
     testImplementation(libs.junit)
 }
 
-val archive = tasks.register("archive") {
-    inputs.property("gitVersionTriple.third", gitVersionTriple.third)
-
-    val outputFile = archiveDir.map { it.file("archive.tar") }
-    outputs.file(outputFile)
-
-    doLast {
-        val format = "tar_for_task_$name"
-
-        ArchiveCommand.registerFormat(format, TarFormat())
-        try {
-            outputFile.get().asFile.outputStream().use {
-                git.archive()
-                    .setTree(git.repository.resolve(gitVersionTriple.third.name))
-                    .setFormat(format)
-                    .setOutputStream(it)
-                    .call()
-            }
-        } finally {
-            ArchiveCommand.unregisterFormat(format)
-        }
-    }
-}
-
 android.applicationVariants.all {
     val variant = this
     val capitalized = variant.name.replaceFirstChar { it.uppercase() }
     val variantDir = extraDir.map { it.dir(variant.name) }
-
-    variant.preBuildProvider.configure {
-        dependsOn(archive)
-    }
 
     val moduleProp = tasks.register("moduleProp${capitalized}") {
         inputs.property("projectUrl", projectUrl)
